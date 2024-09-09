@@ -1,5 +1,6 @@
 // import authRouter from './routes/authRoute';
 const authRouter = require('./routes/authRoute');
+const newChat = require('./routes/newChat')
 const express = require('express');
 const WebSocket = require('ws');
 const  mongoose = require('mongoose')
@@ -38,6 +39,7 @@ mongoose.connect('mongodb+srv://chatapp:udaysama@cluster0.wqvun.mongodb.net/')
 app.use(express.json());
 
 app.use('/auth',authRouter);
+app.use('/chat',newChat);
 
 // Start the server
 const port = 3000;
