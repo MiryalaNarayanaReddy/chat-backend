@@ -39,17 +39,22 @@ function setupWebSocket() {
     if (!chatSession.user1.id) {
       chatSession.user1.id = userId;
       chatSession.user1.ws = ws;
+
       console.log(`User ${userId} connected as user1 in chat ${chatId}.`);
+    
     } else if (!chatSession.user2.id && chatSession.user1.id !== userId) {
       chatSession.user2.id = userId;
       chatSession.user2.ws = ws;
       console.log(`User ${userId} connected as user2 in chat ${chatId}.`);
+    
     } else if (chatSession.user1.id === userId) {
       chatSession.user1.ws = ws;  // Reconnecting user1
       console.log(`User ${userId} reconnected as user1 in chat ${chatId}.`);
+    
     } else if (chatSession.user2.id === userId) {
       chatSession.user2.ws = ws;  // Reconnecting user2
       console.log(`User ${userId} reconnected as user2 in chat ${chatId}.`);
+    
     } else {
       console.log(`Chat ${chatId} already has two users.`);
       ws.close();

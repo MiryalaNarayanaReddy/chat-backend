@@ -254,3 +254,45 @@ paths:
             ws.onclose = function () {
               console.log('WebSocket connection closed.');
             };
+
+  /chat/my/all:
+    get:
+      summary: Retrieve all chats for the authenticated user
+      description: |
+        Retrieves a list of all chat sessions associated with the authenticated user. This endpoint requires user authentication and returns all chat sessions where the user is `user1`.
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Successfully retrieved the list of chats
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  chats:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        _id:
+                          type: string
+                          description: Unique identifier of the chat
+                        user1:
+                          type: string
+                          description: ID of the first user in the chat
+                        user2:
+                          type: string
+                          description: ID of the second user in the chat
+                    description: Array of chat objects
+        '401':
+          description: Unauthorized (e.g., user is not authenticated)
+        '500':
+          description: Internal server error (e.g., database issue)
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

@@ -13,53 +13,39 @@ const getAllUsers = async (req, res) => {
     }
 }
 
-const addChat = async (req, res) => {   
+const addChat = async (req, res) => {
 
     try {
-        const { user2 } = req.body;
-        
+        const { add_user_id } = req.body;
+
         // get from middleware req.user = data.username;
         const user = req.user; // gives undefined if you use ===>  const {user} = req.user;
 
-        // console.log(user);
-
-        const user_1 = await UserModel.findOne({username:user});
-        const user_2 = await  UserModel.findOne({username:user2});
-
-        // console.log(user_1);
-        // console.log(user_2);
-
-
-
         const _chat = await ChatModel.create({
-            messages:[]
+            messages: []
         })
-
-        // console.log(_chat._id);
-
-        // Cannot read properties of null (reading '_id')
 
         const relation1 = await RelationModel.create(
             {
-                user1:user_1._id,
-                user2:user_2._id,
-                chatId:_chat._id
+                user1: user._id,
+                user2: add_user_id,
+                chatId: _chat._id
             }
         )
 
         const relation2 = await RelationModel.create(
             {
-                user1:user_2._id,
-                user2:user_1._id,
-                chatId:_chat._id
+                user1: add_user_id,
+                user2: user._id,
+                chatId: _chat._id
             }
         )
 
-        res.status(200).json({ chatId:_chat._id });
+        res.status(200).json({ chatId: _chat._id });
 
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
 }
 
-module.exports = { getAllUsers , addChat};
+module.exports = { getAllUsers, addChat };

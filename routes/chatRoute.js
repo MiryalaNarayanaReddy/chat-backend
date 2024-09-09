@@ -8,5 +8,6 @@ const chatController = require('../controllers/chatController');
 
 
 chatRouter.get('/:chatId',isAuthenticated, chatController.getChat);
+chatRouter.get('/my/all',isAuthenticated, chatController.getAllChats);
 
 module.exports = chatRouter;

@@ -23,7 +23,10 @@ const isAuthenticated = (req, res, next) => {
         // Verify the token
         const data = jwt.verify(token, JWT_SECRET);
         // console.log(data);
-        req.user = data.username;
+        req.user = {
+            username: data.username,
+            _id: data._id
+        };
         // not able to get the username
         next();
     } catch (error) {
