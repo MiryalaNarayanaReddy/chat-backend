@@ -1,35 +1,92 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Real-Time Chat</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WebSocket Chat</title>
 </head>
 <body>
-  <h1>Real-Time Chat</h1>
-  <div id="messages"></div>
-  <input type="text" id="messageInput" />
-  <button onclick="sendMessage()">Send</button>
+  <h1>WebSocket Chat</h1>
+  
+  <label for="userId">Your User ID:</label>
+  <input type="text" id="userId" value="user123"><br><br>
+
+  <label for="chatId">Chat ID:</label>
+  <input type="text" id="chatId" value="chat1"><br><br>
+
+  <button id="connectBtn">Connect</button><br><br>
+
+  <label for="messageInput">Message:</label>
+  <input type="text" id="messageInput">
+  <button id="sendMessageBtn">Send Message</button>
+
+  <h2>Chat Log:</h2>
+  <div id="chatLog"></div>
 
   <script>
-    const socket = new WebSocket('ws://localhost:8080');
+    let ws;
 
-    // Event listener for WebSocket connection open
-    socket.addEventListener('open', () => {
-      console.log('Connected to WebSocket server.');
-    });
+    // Function to connect WebSocket with user ID and chat ID
+    function connectWebSocket() {
+      const userId = document.getElementById('userId').value;
+      const chatId = document.getElementById('chatId').value;
 
-    // Event listener for incoming messages
-    socket.addEventListener('message', (event) => {
-      const messagesDiv = document.getElementById('messages');
-      messagesDiv.innerHTML += `<p>${event.data.toString()}</p>`;
-    });
+      if (ws) ws.close();  // Close existing connection if any
 
-    // Function to send messages
-    function sendMessage() {
-      const messageInput = document.getElementById('messageInput');
-      const message = messageInput.value;
-      socket.send(message);
-      messageInput.value = '';
+      ws = new WebSocket(`ws://localhost:8080/?userId=${userId}&chatId=${chatId}`);
+
+      ws.onopen = () => {
+        console.log(`Connected as ${userId} in chat ${chatId}`);
+        logMessage(`Connected as ${userId} in chat ${chatId}`);
+      };
+
+      ws.onmessage = (event) => {
+        const messageData = JSON.parse(event.data);
+        logMessage(`Message from ${messageData.from}: ${messageData.content}`);
+      };
+      
+
+      ws.onclose = () => {
+        console.log(`Connection closed`);
+        logMessage('Connection closed');
+      };
+
+      ws.onerror = (error) => {
+        console.log(`WebSocket error: ${error}`);
+        logMessage('WebSocket error');
+      };
     }
+
+    // Function to send a message to the chat
+    function sendMessage() {
+      const messageContent = document.getElementById('messageInput').value;
+
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        const message = {
+          type: 'message',
+          senderId: document.getElementById('userId').value,
+          content: messageContent
+        };
+        ws.send(JSON.stringify(message));
+        logMessage(`Sent message: ${messageContent}`);
+      } else {
+        logMessage('WebSocket is not connected.');
+      }
+    }
+
+    // Function to log messages to the chat log
+    function logMessage(message) {
+      const chatLog = document.getElementById('chatLog');
+      const messageElement = document.createElement('p');
+      messageElement.textContent = message;
+      chatLog.appendChild(messageElement);
+    }
+
+    // Event listener for the connect button
+    document.getElementById('connectBtn').addEventListener('click', connectWebSocket);
+
+    // Event listener for the send message button
+    document.getElementById('sendMessageBtn').addEventListener('click', sendMessage);
   </script>
 </body>
 </html>
