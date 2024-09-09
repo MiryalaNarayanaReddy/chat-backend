@@ -1,7 +1,9 @@
-const express = require('express')
-const authRouter = express();
+const express = require('express');
+const authRouter = express.Router();
+const authUser = require('../controllers/authController');
 
-authRouter.post('signup',signup);
-authRouter.get('login',login);
+// Define routes with the correct HTTP methods
+authRouter.route('/signup').post(authUser.signup);
+authRouter.route('/login').post(authUser.login); // Changed from GET to POST
 
-export default authRouter;
+module.exports = authRouter;
