@@ -1,15 +1,24 @@
-// import authRouter from './routes/authRoute';
 const authRouter = require('./routes/authRoute');
 const userRouter = require('./routes/userRoute');
 const chatRouter = require('./routes/chatRoute');
 
 const express = require('express');
-const WebSocket = require('ws');
 const  mongoose = require('mongoose')
-
-
-
 const app = express();
+
+
+const swaggerUi = require('swagger-ui-express');
+const YAML = require('yamljs');
+const path = require('path');
+// Load the YAML file
+const swaggerDocument = YAML.load(path.join(__dirname, './swagger.yaml'));
+
+// Serve Swagger UI
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+
+
+
+const WebSocket = require('ws');
 
 // Initialize WebSocket server
 const wss = new WebSocket.Server({ port: 8080 });
