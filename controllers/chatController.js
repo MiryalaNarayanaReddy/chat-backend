@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const ChatModel = require('../model/Chat')
+const ChatModel = require('../model/ChatModel')
 
 const getChat = async (req, res) => {
     try {

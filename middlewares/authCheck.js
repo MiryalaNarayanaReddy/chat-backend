@@ -22,7 +22,9 @@ const isAuthenticated = (req, res, next) => {
     try {
         // Verify the token
         const data = jwt.verify(token, JWT_SECRET);
+        // console.log(data);
         req.user = data.username;
+        // not able to get the username
         next();
     } catch (error) {
         // Handle invalid token

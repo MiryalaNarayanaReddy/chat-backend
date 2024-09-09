@@ -8,9 +8,6 @@ newChat.post('/create',isAuthenticated,(req,res)=>{
     try{
 
         // console.log("user",req.user);
-
-        
-
         const {user2} = req.body;
         console.log(user2)
         return res.json({
