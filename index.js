@@ -1,3 +1,5 @@
+// import authRouter from './routes/authRoute';
+const authRouter = require('./routes/authRoute');
 const express = require('express');
 const WebSocket = require('ws');
 const  mongoose = require('mongoose')
@@ -28,11 +30,13 @@ wss.on('connection', (ws) => {
     console.log('A client disconnected.');
   });
 });
-mongoose.connect('mongodb://127.0.0.1:27017/test')
+mongoose.connect('mongodb+srv://chatapp:udaysama@cluster0.wqvun.mongodb.net/')
   .then(() => console.log('Connected!'));
 
 
-import authRouter from './routes/authRoute';
+
+app.use(express.json());
+
 app.use('/auth',authRouter);
 
 // Start the server
