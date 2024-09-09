@@ -1,8 +1,11 @@
 const WebSocket = require('ws');
 const url = require('url');
 
-// Dictionary to store WebSocket connections by chat ID
-const chatSessions = {};
+
+// keeps ws as keys and chatId
+const wsToChatId = {};
+const chatSessions = {}; // chatId -> { user1: { id, ws }, user2: { id, ws } }
+
 
 function setupWebSocket() {
   // Initialize WebSocket server
@@ -63,14 +66,12 @@ function setupWebSocket() {
         console.log(`Message from ${senderId} in chat ${chatId}: ${content}`);
 
         // Determine the recipient based on sender
-        const recipient = chatSession.user1.id === senderId ? chatSession.user2 : chatSession.user1;
+        const recipient = chatSession.user1.id === senderId ? chatSession.user2 : chatSession.user1;  
 
-        if (recipient.ws && recipient.ws.readyState === WebSocket.OPEN) {
-          // Send the message to the recipient
-          recipient.ws.send(JSON.stringify({
-            from: senderId,
-            content: content,
-          }));
+        // Send the message to the recipient if they are connected
+        if (recipient.ws) {
+          recipient.ws.send(JSON.stringify({ type: 'message', senderId, content}));
+
         } else {
           console.log(`User ${recipient.id} is not connected in chat ${chatId}.`);
         }

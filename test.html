@@ -22,7 +22,7 @@
 
   <h2>Chat Log:</h2>
   <div id="chatLog"></div>
-
+</body>
   <script>
     let ws;
 
@@ -42,7 +42,8 @@
 
       ws.onmessage = (event) => {
         const messageData = JSON.parse(event.data);
-        logMessage(`Message from ${messageData.from}: ${messageData.content}`);
+        logMessage(`Message from ${messageData.senderId}: ${messageData.content}`);
+
       };
       
 
@@ -88,5 +89,5 @@
     // Event listener for the send message button
     document.getElementById('sendMessageBtn').addEventListener('click', sendMessage);
   </script>
-</body>
+
 </html>
