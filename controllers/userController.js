@@ -6,12 +6,7 @@ const ChatModel = require('../model/ChatModel');
 
 const getAllUsers = async (req, res) => {
     try {
-        // get only username and _id
-
-        // const users = await UserModel.find();
-
         const users = await UserModel.find({}, { username: true, _id: true });
-
         res.status(200).json({ users });
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -24,15 +19,15 @@ const addChat = async (req, res) => {
         const { user2 } = req.body;
         
         // get from middleware req.user = data.username;
-        const user = req.user; // giving undefined
+        const user = req.user; // gives undefined if you use ===>  const {user} = req.user;
 
-        console.log(user);
+        // console.log(user);
 
         const user_1 = await UserModel.findOne({username:user});
         const user_2 = await  UserModel.findOne({username:user2});
 
-        console.log(user_1);
-        console.log(user_2);
+        // console.log(user_1);
+        // console.log(user_2);
 
 
 
@@ -40,7 +35,7 @@ const addChat = async (req, res) => {
             messages:[]
         })
 
-        console.log(_chat._id);
+        // console.log(_chat._id);
 
         // Cannot read properties of null (reading '_id')
 
@@ -66,8 +61,5 @@ const addChat = async (req, res) => {
         res.status(500).json({ error: err.message });
     }
 }
-
-
-
 
 module.exports = { getAllUsers , addChat};
