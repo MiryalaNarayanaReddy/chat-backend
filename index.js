@@ -1,5 +1,6 @@
 const express = require('express');
 const WebSocket = require('ws');
+const  mongoose = require('mongoose')
 
 const app = express();
 
@@ -27,6 +28,12 @@ wss.on('connection', (ws) => {
     console.log('A client disconnected.');
   });
 });
+mongoose.connect('mongodb://127.0.0.1:27017/test')
+  .then(() => console.log('Connected!'));
+
+
+import authRouter from './routes/authRoute';
+app.use('/auth',authRouter);
 
 // Start the server
 const port = 3000;
