@@ -212,4 +212,45 @@ paths:
                     type: string
                     example: "Error message"
 
+  /ws:
+    get:
+      summary: Establish a WebSocket connection
+      description: |
+        Use this WebSocket endpoint to connect to the chat server for real-time communication.
+        You need to provide the `userId` and `chatId` as query parameters to join a specific chat.
+        connection url ws://localhost:8080/?userId=${userId}&chatId=${chatId}
+      parameters:
+        - name: userId
+          in: query
+          required: true
+          description: ID of the user connecting to the WebSocket server.
+          schema:
+            type: string
+        - name: chatId
+          in: query
+          required: true
+          description: ID of the chat session the user is joining.
+          schema:
+            type: string
+      responses:
+        '101':
+          description: WebSocket connection established
+        '400':
+          description: Bad Request (e.g., missing userId or chatId)
+      x-codeSamples:
+        - lang: javascript
+          source: |
+            const ws = new WebSocket('ws://localhost:8080/?userId=USER_ID&chatId=CHAT_ID');
 
+            ws.onopen = function () {
+              console.log('WebSocket connection established.');
+            };
+
+            ws.onmessage = function (event) {
+              const data = JSON.parse(event.data);
+              console.log('Message received:', data);
+            };
+
+            ws.onclose = function () {
+              console.log('WebSocket connection closed.');
+            };
