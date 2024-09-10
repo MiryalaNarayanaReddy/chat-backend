@@ -10,7 +10,7 @@ const userRouter = require('./routes/userRoute');
 const chatRouter = require('./routes/chatRoute');
 
 // Import WebSocket handling
-const setupWebSocket = require('./websocket');
+const {setupWebSocket} = require('./websocket');
 
 // Initialize Express app
 const app = express();
