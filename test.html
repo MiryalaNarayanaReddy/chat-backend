@@ -85,6 +85,7 @@
         const messageData = JSON.parse(event.data);
         const originalMessage = messageData.content;
 
+
         // Translate the received message
         translateMessage(originalMessage).then(translatedMessage => {
           logMessage(originalMessage, false, translatedMessage);
@@ -136,9 +137,9 @@
       } else {
         originalMessageElement.textContent = originalMessage;
         translatedMessageElement.textContent = translatedMessage ? translatedMessage : '...';
-
-        chatLog.appendChild(originalMessageElement);
-        chatLog.appendChild(translatedMessageElement);
+          chatLog.appendChild(originalMessageElement);
+          if(translatedMessage)
+            chatLog.appendChild(translatedMessageElement);
       }
 
       // Auto-scroll to the bottom
