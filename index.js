@@ -5,7 +5,13 @@ const chatRouter = require('./routes/chatRoute');
 const express = require('express');
 const  mongoose = require('mongoose')
 const app = express();
+var cors = require('cors')
 
+app.use(cors({
+  origin: 'http://localhost:5173', // Replace with your frontend URL
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 
 const swaggerUi = require('swagger-ui-express');
 const YAML = require('yamljs');

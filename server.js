@@ -14,6 +14,9 @@ const setupWebSocket = require('./websocket');
 
 // Initialize Express app
 const app = express();
+var cors = require('cors')
+
+app.use(cors());
 
 // Loading Swagger documentation
 const swaggerDocument = YAML.load(path.join(__dirname, './swagger.yaml'));
