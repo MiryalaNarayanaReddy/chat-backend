@@ -4,6 +4,40 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>WebSocket Chat</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+    .chat-container {
+      width: 80%;
+      margin: 0 auto;
+    }
+    .message-log {
+      max-height: 500px;
+      overflow-y: auto;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      padding: 10px;
+      background-color: #f9f9f9;
+    }
+    .message {
+      margin-bottom: 10px;
+      padding: 10px;
+      border-radius: 5px;
+    }
+    .original-message {
+      background-color: #e0e0e0;
+      color: #000;
+    }
+    .translated-message {
+      background-color: #d0ffd0;
+      color: #005700;
+      text-align: right;
+    }
+    #translationOptions {
+      margin-bottom: 10px;
+    }
+  </style>
 </head>
 <body>
   <h1>WebSocket Chat</h1>
@@ -14,6 +48,12 @@
   <label for="chatId">Chat ID:</label>
   <input type="text" id="chatId" value="chat1"><br><br>
 
+  <label for="translationOptions">Select Translation Language:</label>
+  <select id="translationOptions">
+    <option value="hindi">Hindi</option>
+    <option value="english" selected>English</option>
+  </select><br><br>
+
   <button id="connectBtn">Connect</button><br><br>
 
   <label for="messageInput">Message:</label>
@@ -21,8 +61,9 @@
   <button id="sendMessageBtn">Send Message</button>
 
   <h2>Chat Log:</h2>
-  <div id="chatLog"></div>
-</body>
+  <div id="chatLog" class="message-log"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
   <script>
     let ws;
 
@@ -37,24 +78,27 @@
 
       ws.onopen = () => {
         console.log(`Connected as ${userId} in chat ${chatId}`);
-        logMessage(`Connected as ${userId} in chat ${chatId}`);
+        logMessage(`Connected as ${userId} in chat ${chatId}`, true);
       };
 
       ws.onmessage = (event) => {
         const messageData = JSON.parse(event.data);
-        logMessage(`Message from ${messageData.senderId}: ${messageData.content}`);
+        const originalMessage = messageData.content;
 
+        // Translate the received message
+        translateMessage(originalMessage).then(translatedMessage => {
+          logMessage(originalMessage, false, translatedMessage);
+        });
       };
-      
 
       ws.onclose = () => {
         console.log(`Connection closed`);
-        logMessage('Connection closed');
+        logMessage('Connection closed', true);
       };
 
       ws.onerror = (error) => {
         console.log(`WebSocket error: ${error}`);
-        logMessage('WebSocket error');
+        logMessage('WebSocket error', true);
       };
     }
 
@@ -69,19 +113,71 @@
           content: messageContent
         };
         ws.send(JSON.stringify(message));
-        logMessage(`Sent message: ${messageContent}`);
+        logMessage(`Me: ${messageContent}`, false);  // Show the original message for sender
       } else {
-        logMessage('WebSocket is not connected.');
+        logMessage('WebSocket is not connected.', true);
       }
     }
 
     // Function to log messages to the chat log
-    function logMessage(message) {
+    function logMessage(originalMessage, isSystemMessage = false, translatedMessage = '') {
       const chatLog = document.getElementById('chatLog');
-      const messageElement = document.createElement('p');
-      messageElement.textContent = message;
-      chatLog.appendChild(messageElement);
+
+      const originalMessageElement = document.createElement('div');
+      const translatedMessageElement = document.createElement('div');
+
+      originalMessageElement.classList.add('message', 'original-message');
+      translatedMessageElement.classList.add('message', 'translated-message');
+
+      if (isSystemMessage) {
+        originalMessageElement.textContent = originalMessage;
+        originalMessageElement.style.color = 'red';
+        chatLog.appendChild(originalMessageElement);
+      } else {
+        originalMessageElement.textContent = originalMessage;
+        translatedMessageElement.textContent = translatedMessage ? translatedMessage : '...';
+
+        chatLog.appendChild(originalMessageElement);
+        chatLog.appendChild(translatedMessageElement);
+      }
+
+      // Auto-scroll to the bottom
+      chatLog.scrollTop = chatLog.scrollHeight;
     }
+
+    // Function to translate message using Axios and Flask backend
+   // Function to translate message using Axios and the external API
+function translateMessage(message) {
+  const targetLanguage = document.getElementById('translationOptions').value;
+  const apiUrl = "https://llmfoundry.straive.com/openai/v1/chat/completions";
+  
+  return axios.post(apiUrl, {
+      model: "gpt-4o-mini",
+      messages: [
+        {
+          role: "user",
+          content: `Translate this into ${targetLanguage}, all words in that language only, just give one sentence and only the sentence, not anything else with it: ${message}`
+        }
+      ]
+    }, 
+    {
+      headers: {
+        "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Imtlc2F2LnNhbnRob3NoQHN0cmFpdmUuY29tIn0.w6n7WvhB4h5hpb7ZjQIZf5LiRxnJnqlM10O-N8gPuK8" ,  // Add the correct API key here
+        "Content-Type": "application/json"
+      }
+    })
+    .then(response => {
+      if (response.data.choices && response.data.choices[0].message.content) {
+        return response.data.choices[0].message.content;
+      } else {
+        return 'Translation failed';
+      }
+    })
+    .catch(error => {
+      console.error('Error translating message:', error);
+      return 'Translation error';
+    });
+}
 
     // Event listener for the connect button
     document.getElementById('connectBtn').addEventListener('click', connectWebSocket);
@@ -90,4 +186,5 @@
     document.getElementById('sendMessageBtn').addEventListener('click', sendMessage);
   </script>
 
+</body>
 </html>
